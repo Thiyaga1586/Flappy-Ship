@@ -1,8 +1,20 @@
-import java.awt.*; //includes component,container,window,frame,dialog,canvas,panek,image,menu component,font,colors,etc
-import java.awt.event.*;
+//includes component,container,window,frame,dialog,canvas,panek,image,menu component,font,colors,etc
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.net.URL;
+import javax.sound.sampled.*;
 import java.util.ArrayList;
 import java.util.Random;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 //ActionListener - The listener interface for recieving action events
 //KeyListener - The listener interface for receiving keyboard events
 //Jpanel - a generic lightweight container
@@ -47,22 +59,50 @@ public class FlappyShip extends JPanel implements ActionListener, KeyListener {
             this.img = img;
         }
     }
+    //sound
+    class Sound {
+        Clip clip;
+        URL soundUrl[] = new URL[30];
+        public Sound() {
+            soundUrl[0] = getClass().getResource("spaceship.wav");
+            soundUrl[1] = getClass().getResource("crash.wav");
+            soundUrl[2] = getClass().getResource("space-slash.wav");
+        }
+        public void setFile(int i) {
+            try{
+                AudioInputStream ais = AudioSystem.getAudioInputStream(soundUrl[i]);
+                clip = AudioSystem.getClip();
+                clip.open(ais);
+            }catch(Exception e) {
+            }
+        }
+        public void play() {
+            clip.start();
+        }
+        public void loop() {
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+        }
+        public void stop() {
+            clip.stop();
+        }
+    }
     //game logic
     Ship ship;
     int velocityX = -4; //move pipes to the left speed (simulataneously ship moving right)
     int velocityY = 0; //move ship up/down speed
     int gravity = 1;
-    ArrayList<Pipe> pipes;
-    Random random = new Random();
-    Timer gameloop;
-    Timer placePipeTimer;
+    ArrayList<Pipe> pipes; //creating an array of pipes
+    Random random = new Random(); //to place the pipes in random
+    Timer gameloop;  //loop of the(i.e the game won't end until the ship got hit by the pipe)
+    Timer placePipeTimer;  //to manage the movement of pipes
     boolean gameover = false;
     double score = 0;
     double highestscore = 0;
+    Sound sound;
     FlappyShip() {
-        setPreferredSize(new Dimension(boardwidth,boardheight));
+        setPreferredSize(new Dimension(boardwidth,boardheight));  //frame
         //load images
-        setFocusable(true);
+        setFocusable(true); 
         addKeyListener(this);
         backgroundImg = new ImageIcon(getClass().getResource("./space.png")).getImage();
         shipImg = new ImageIcon(getClass().getResource("./spaceship.png")).getImage();
@@ -71,6 +111,7 @@ public class FlappyShip extends JPanel implements ActionListener, KeyListener {
         //ship
         ship = new Ship(shipImg);
         pipes = new ArrayList<Pipe>();
+        sound = new Sound();
         //placepipetimer
         placePipeTimer = new Timer(1500, new ActionListener() {
             @Override
@@ -138,15 +179,17 @@ public class FlappyShip extends JPanel implements ActionListener, KeyListener {
                 pipe.passed = true;
                 score += 0.5; //0.5 because there are 2 pipes! so 0.5*2=1, 1 for each set of pipes
             }
-            if(collision(ship, pipe)) {
-                gameover = true;
+            if(collisions(ship, pipe)) {
+                gameover = true ;
+                playSoundEffect(1);
             }
         }
         if(ship.y>boardheight) {
             gameover=true;
+            playSoundEffect(2);
         }
     }
-    public boolean collision(Ship a,Pipe b) {
+    public boolean collisions(Ship a,Pipe b) {
         return a.x < b.x + b.width &&  //a's top left corner doesn't reach b's top right corner
                a.x + a.width > b.x &&  //a's top right corner passes b's top left corner
                a.y < b.y + b.height && //a's top left corner doesn't reach b's bottom left corner
@@ -164,6 +207,7 @@ public class FlappyShip extends JPanel implements ActionListener, KeyListener {
 	}
 	@Override
 	public void keyPressed(KeyEvent e) {
+        //to access the keyboard
 		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
             velocityY = -9;
             if(gameover) {
@@ -183,5 +227,12 @@ public class FlappyShip extends JPanel implements ActionListener, KeyListener {
 
 	@Override
 	public void keyReleased(KeyEvent e) {}
+    
+    //adding sound
+    public void playSoundEffect(int i) {
+        sound.setFile(i);
+        sound.play();
+
+    }
 }
 
