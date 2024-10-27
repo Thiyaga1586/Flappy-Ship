@@ -2,12 +2,12 @@ Flappy-Ship
 ---------
 **Gameplay:**
 
-The player controls the spaceship, which moves persistently to the right.Spaceship automatically descends and only ascends when the player hit space.The player is rewarded with a point for each successful pass through a pair of pipes.
+The gamer maneuvers a spacecraft that continuously glides to the right. The ship automatically drops downward and only rises when the player taps the space bar. Each time the player successfully navigates through a pair of pipes, they earn a point as a reward.
 
 **Objective:**
 
-The player is tasked with navigating spaceship through pairs of pipes that have equally sized gaps placed at random heights.
+The player must steer their spaceship through sets of pipes that feature identically sized openings situated at various heights, challenging their navigation skills.
 
 **Orgin:**
 
-This game is designed based on the Flappy Bird game.
+This game is inspired by the classic Flappy Bird game that was designed a decade ago.
